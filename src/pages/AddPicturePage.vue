@@ -3,16 +3,21 @@
     <h2 style="margin-bottom: 16px">
       {{ route.query?.id ? '修改图片' : '创建图片' }}
     </h2>
+    <a-typography-paragraph v-if="spaceId" type="secondary">
+      保存至空间：<a :href="`/space/${spaceId}`" target="_blank">{{ spaceId }}</a>
+    </a-typography-paragraph>
+
     <!-- 选择上传方式 -->
     <a-tabs v-model:activeKey="uploadType"
     >>
       <a-tab-pane key="file" tab="文件上传">
-        <PictureUpload :picture="picture" :onSuccess="onSuccess" />
+        <PictureUpload :picture="picture" :spaceId="spaceId" :onSuccess="onSuccess" />
       </a-tab-pane>
       <a-tab-pane key="url" tab="URL 上传" force-render>
-        <UrlPictureUpload :picture="picture" :onSuccess="onSuccess" />
+        <UrlPictureUpload :picture="picture" :spaceId="spaceId" :onSuccess="onSuccess" />
       </a-tab-pane>
     </a-tabs>
+
 
     <!-- 图片信息表单 -->
     <a-form
@@ -59,12 +64,13 @@
 
 <script setup lang="ts">
 import PictureUpload from '@/components/PictureUpload.vue'
-import { onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
 import { message } from 'ant-design-vue'
 import {
   editPictureUsingPost,
   getPictureVoByIdUsingGet,
-  listPictureTagCategoryUsingGet, uploadPictureByUrlUsingPost
+  listPictureTagCategoryUsingGet,
+  uploadPictureByUrlUsingPost,
 } from '@/api/pictureController.ts'
 import { useRoute, useRouter } from 'vue-router'
 import _default from 'ant-design-vue/es/vc-slick/inner-slider'
@@ -98,8 +104,10 @@ const handleSubmit = async (values: any) => {
   }
   const res = await editPictureUsingPost({
     id: pictureId,
+    spaceId: spaceId.value,
     ...values,
   })
+
   // 操作成功
   if (res.data.code === 0 && res.data.data) {
     message.success('创建成功')
@@ -114,33 +122,10 @@ const handleSubmit = async (values: any) => {
 
 const categoryOptions = ref<string[]>([])
 const tagOptions = ref<string[]>([])
-const loading = ref<boolean>(false)
-const fileUrl = ref<string>()
+const spaceId = computed(() => {
+  return route.query?.spaceId
+})
 
-/**
- * 上传
- */
-const handleUpload = async () => {
-  loading.value = true
-  try {
-    const params: API.PictureUploadRequest = { fileUrl: fileUrl.value }
-    if (props.picture) {
-      params.id = props.picture.id
-    }
-    const res = await uploadPictureByUrlUsingPost(params)
-    if (res.data.code === 0 && res.data.data) {
-      message.success('图片上传成功')
-      // 将上传成功的图片信息传递给父组件
-      props.onSuccess?.(res.data.data)
-    } else {
-      message.error('图片上传失败，' + res.data.message)
-    }
-  } catch (error) {
-    message.error('图片上传失败')
-  } finally {
-    loading.value = false
-  }
-}
 
 /**
  * 获取标签和分类选项
@@ -190,6 +175,8 @@ const getOldPicture = async () => {
     }
   }
 }
+// 空间 id
+
 
 onMounted(() => {
   getOldPicture()
@@ -202,4 +189,3 @@ onMounted(() => {
   margin: 0 auto;
 }
 </style>
-

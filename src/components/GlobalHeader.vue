@@ -31,6 +31,13 @@
                   <LogoutOutlined />
                   退出登录
                 </a-menu-item>
+                <a-menu-item>
+                  <router-link to="/my_space">
+                    <UserOutlined />
+                    我的空间
+                  </router-link>
+                </a-menu-item>
+
               </a-menu>
             </template>
           </a-dropdown>
@@ -95,6 +102,12 @@ const originItems = [
     label: '用户管理',
     title: '用户管理',
   },
+  {
+    key: '/admin/spaceManage',
+    label: '空间管理',
+    title: '空间管理',
+  },
+
 
 
 

@@ -25,8 +25,10 @@ import { uploadPictureUsingPost } from '@/api/pictureController.ts'
 
 interface Props {
   picture?: API.PictureVO
+  spaceId?: number
   onSuccess?: (newPicture: API.PictureVO) => void
 }
+
 
 const props = defineProps<Props>()
 
@@ -37,8 +39,15 @@ const props = defineProps<Props>()
 const handleUpload = async ({ file }: any) => {
   loading.value = true
   try {
-    const params = props.picture ? { id: props.picture.id } : {}
+    // 上传时传递 spaceId
+    const params: API.PictureUploadRequest = props.picture ? { id: props.picture.id } : {}
+    params.spaceId = props.spaceId;
+
+    console.log("请求参数:", params); // 打印参数
+    console.log("spaceId 值:", props.spaceId); // 单独检查 spaceId
+
     const res = await uploadPictureUsingPost(params, {}, file)
+
     if (res.data.code === 0 && res.data.data) {
       message.success('图片上传成功')
       // 将上传成功的图片信息传递给父组件
@@ -72,6 +81,7 @@ const beforeUpload = (file: UploadProps['fileList'][number]) => {
   }
   return isJpgOrPng && isLt25M
 }
+
 </script>
 <style scoped>
 .picture-upload :deep(.ant-upload) {
