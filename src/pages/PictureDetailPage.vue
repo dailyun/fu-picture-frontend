@@ -6,7 +6,7 @@
     <a-col :sm="24" :md="16" :xl="18">
       <a-card title="图片预览">
         <a-image
-          style="max-height: 600px; object-fit: contain"
+          style="max-height: 1000px; object-fit: contain"
           :src="picture.url"
         />
       </a-card>

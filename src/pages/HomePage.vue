@@ -32,8 +32,6 @@
     </div>
 
     <!-- 图片列表 -->
-
-    <!-- 图片列表 -->
     <PictureList :dataList="dataList" :loading="loading" />
     <a-pagination
       style="text-align: right"
@@ -102,20 +100,6 @@ const doSearch = () => {
   fetchData()
 }
 
-// 分页参数
-const pagination = computed(() => {
-  return {
-    current: searchParams.current ?? 1,
-    pageSize: searchParams.pageSize ?? 10,
-    total: total.value,
-    // 切换页号时，会修改搜索参数并获取数据
-    onChange: (page, pageSize) => {
-      searchParams.current = page
-      searchParams.pageSize = pageSize
-      fetchData()
-    },
-  }
-})
 
 const fetchData = async () => {
   loading.value = true
