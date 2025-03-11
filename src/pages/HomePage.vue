@@ -3,7 +3,7 @@
     <!-- 搜索框 -->
     <div class="search-bar">
       <a-input-search
-        placeholder="从海量图片中搜索"
+        placeholder="搜搜看"
         v-model:value="searchParams.searchText"
         enter-button="搜索"
         size="large"
@@ -33,6 +33,7 @@
 
     <!-- 图片列表 -->
     <PictureList :dataList="dataList" :loading="loading" />
+
     <a-pagination
       style="text-align: right"
       v-model:current="searchParams.current"
@@ -53,6 +54,7 @@ import {
 import { message } from 'ant-design-vue'
 import { useRouter } from 'vue-router'
 import PictureList from '@/components/PictureList.vue'
+import PictureListWaterFull from '@/components/PictureListWaterFull.vue'
 
 const dataList = ref([])
 const total = ref(0)

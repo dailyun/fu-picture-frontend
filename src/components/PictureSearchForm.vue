@@ -1,7 +1,7 @@
 
 
 <template>
-  <<div class="picture-search-form">
+  <div class="picture-search-form">
   <!-- 搜索表单 -->
   <a-form layout="inline" :model="searchParams" @finish="doSearch">
     <a-form-item label="关键词" name="searchText">

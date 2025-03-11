@@ -12,7 +12,7 @@
           <a-card hoverable @click="doClickPicture(picture)">
             <template #cover>
               <img
-                style="height: 280px; object-fit: cover"
+                style="height: 350px; object-fit: cover"
                 :alt="picture.name"
                 :src="picture.thumbnailUrl ?? picture.url"
                 loading="lazy"
