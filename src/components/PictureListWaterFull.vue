@@ -1,24 +1,28 @@
 <template>
   <Waterfall
     :list="dataList"
+    :width="380"
+    :breakpoints="{
+      2000: { rowPerView: 5 },
+      1600: { rowPerView: 4 }, // 超宽屏
+      1200: { rowPerView: 3 }, // 桌面端
+      768: { rowPerView: 2 }, // 平板
+      480: { rowPerView: 1 }, // 手机
+    }"
+    :gutter="16"
   >
-  <template #default="{ item, url, index }">
-    <div class="card">
-      <!-- 图片展示 -->
-      <LazyImg
-        :url="item.thumbnailUrl?? item.url"
-        :alt="item.name"
-        :placeholder="null"
-      />
+    <template #default="{ item, url, index }">
+      <div class="card" @click="() => $emit('click-item', item)">
+        <!-- 图片展示 -->
+        <LazyImg :url="item.thumbnailUrl ?? item.url" :alt="item.name" :placeholder="null" />
 
-      <!-- 文字内容 -->
-      <div class="content">
-        <h3 class="title">{{ item.name }}</h3>
-        <p class="introduction">{{ item.introduction }}</p>
-
+        <!-- 文字内容 -->
+        <div class="content">
+          <h3 class="title">{{ item.name }}</h3>
+          <p class="introduction">{{ item.introduction }}</p>
+        </div>
       </div>
-    </div>
-  </template>
+    </template>
   </Waterfall>
 </template>
 
@@ -44,12 +48,10 @@ console.log('完整数据项:', props.dataList)
 console.log('第一个图片 URL:', props.dataList[0]?.url)
 // 字段映射配置
 const waterfallProp = computed(() => ({
-  src: 'url',          // 将组件默认的 src 映射到你的 url 字段
-  width: 'picWidth',   // 宽度字段映射
-  height: 'picHeight'  // 高度字段映射
+  src: 'url', // 将组件默认的 src 映射到你的 url 字段
+  width: 'picWidth', // 宽度字段映射
+  height: 'picHeight', // 高度字段映射
 }))
-
-
 </script>
 
 <style scoped>
@@ -57,18 +59,12 @@ const waterfallProp = computed(() => ({
   border: 1px solid #eee;
   border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
   transition: transform 0.2s;
 }
 
 .card:hover {
   transform: translateY(-2px);
-}
-
-.image {
-  width: 100%;
-  height: auto;
-  aspect-ratio: 16/9; /* 根据实际需求调整 */
 }
 
 .content {
