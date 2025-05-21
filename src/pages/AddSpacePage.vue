@@ -1,6 +1,8 @@
 <template>
   <div id="addSpacePage">
-    <h2 style="margin-bottom: 16px">创建空间</h2>
+    <h2 style="margin-bottom: 16px">
+      {{ route.query?.id ? '修改' : '创建'}}{{ SPACE_TYPE_MAP[spaceType]}}
+    </h2>
     <a-form layout="vertical" :model="formData" @finish="handleSubmit">
       <a-form-item label="空间名称" name="spaceName">
         <a-input v-model:value="formData.spaceName" placeholder="请输入空间名称" allow-clear />
@@ -34,11 +36,16 @@
   </div>
 </template>
 <script setup lang="ts">
-import { onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
 import { message } from 'ant-design-vue'
 import router from '@/router'
-import { uploadPictureByBatchUsingPost } from '@/api/pictureController.ts'
-import { SPACE_LEVEL_ENUM, SPACE_LEVEL_OPTIONS } from '@/constants/space.ts'
+import {
+  SPACE_LEVEL_ENUM,
+  SPACE_LEVEL_MAP,
+  SPACE_LEVEL_OPTIONS,
+  SPACE_TYPE_ENUM,
+  SPACE_TYPE_MAP
+} from '@/constants/space.ts'
 import {
   addSpaceUsingPost,
   getSpaceVoByIdUsingGet,
@@ -68,6 +75,7 @@ const handleSubmit = async (values: any) => {
     // 创建
     res = await addSpaceUsingPost({
       ...formData,
+      spaceType: spaceType.value,
     })
   }
   if (res.data.code === 0 && res.data.data) {
@@ -93,6 +101,14 @@ const fetchSpaceLevelList = async () => {
     message.error('加载空间级别失败，' + res.data.message)
   }
 }
+
+const spaceType = computed(() => {
+  if (route.query?.type) {
+    return Number(route.query.type)
+  }
+  return SPACE_TYPE_ENUM.PRIVATE
+})
+
 const route = useRoute()
 const oldSpace = ref<API.SpaceVO>()
 
@@ -117,6 +133,7 @@ const getOldSpace = async () => {
 onMounted(() => {
   getOldSpace()
 })
+
 
 onMounted(() => {
   fetchSpaceLevelList()

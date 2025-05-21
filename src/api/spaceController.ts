@@ -7,7 +7,7 @@ export async function addSpaceUsingPost(
   body: API.SpaceAddRequest,
   options?: { [key: string]: any }
 ) {
-  return request<API.BaseResponseBoolean_>('/api/space/add', {
+  return request<API.BaseResponseLong_>('/api/space/add', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

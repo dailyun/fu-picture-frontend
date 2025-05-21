@@ -27,6 +27,16 @@
     <a-form-item>
       <a-button type="primary" html-type="submit">搜索</a-button>
     </a-form-item>
+    <a-form-item label="空间类别" name="spaceType">
+      <a-select
+        v-model:value="searchParams.spaceType"
+        :options="SPACE_TYPE_OPTIONS"
+        placeholder="请输入空间类别"
+        style="min-width: 180px"
+        allow-clear
+      />
+    </a-form-item>
+
   </a-form>
 
   <a-table
@@ -40,6 +50,11 @@
       <template v-if="column.dataIndex === 'spaceLevel'">
         <a-tag>{{ SPACE_LEVEL_MAP[record.spaceLevel] }}</a-tag>
       </template>
+      <!-- 空间类别 -->
+      <template v-if="column.dataIndex === 'spaceType'">
+        <a-tag>{{ SPACE_TYPE_MAP[record.spaceType] }}</a-tag>
+      </template>
+
       <!-- 使用情况 -->
       <template v-if="column.dataIndex === 'spaceUseInfo'">
         <div>大小：{{ formatSize(record.totalSize) }} / {{ formatSize(record.maxSize) }}</div>
@@ -70,11 +85,13 @@
 
 import { computed, onMounted, reactive, ref } from 'vue'
 import { message } from 'ant-design-vue'
-import { SPACE_LEVEL_MAP, SPACE_LEVEL_OPTIONS } from '@/constants/space.ts'
+import { SPACE_LEVEL_MAP, SPACE_LEVEL_OPTIONS, SPACE_TYPE_OPTIONS } from '@/constants/space.ts'
 import dayjs from 'dayjs'
-import { listSpaceByPageUsingPost } from '@/api/spaceController.ts'
+import { deleteSpaceUsingPost, listSpaceByPageUsingPost } from '@/api/spaceController.ts'
 import {formatSize} from '@/utils'
-
+import {
+  SPACE_TYPE_MAP
+} from '@/constants/space.ts'
 const columns = [
   {
     title: 'id',
@@ -89,6 +106,11 @@ const columns = [
     title: '空间级别',
     dataIndex: 'spaceLevel',
   },
+  {
+    title: '空间类别',
+    dataIndex: 'spaceType',
+  },
+
   {
     title: '使用情况',
     dataIndex: 'spaceUseInfo',
@@ -159,6 +181,15 @@ const doSearch = () => {
   searchParams.current = 1
   fetchData()
 }
+
+const doDelete = async (id: number) => {
+  const res = await deleteSpaceUsingPost({
+    id,
+  })
+}
+
+
+
 
 // 表格变化处理
 const doTableChange = (page: any) => {

@@ -2,10 +2,28 @@
   <div id="spaceDetailPage">
     <!-- 空间信息 -->
     <a-flex justify="space-between">
-      <h2>{{ space.spaceName }}</h2>
+      <h2>{{ space.spaceName }}（{{ SPACE_TYPE_MAP[space.spaceType] }}）</h2>
+
       <a-space size="middle">
-        <a-button type="primary" :href="`/add_picture?spaceId=${id}`" target="_blank">+ 创建图片
+        <a-button
+          v-if="canUploadPicture"
+          type="primary"
+          :href="`/add_picture?spaceId=${id}`"
+          target="_blank"
+        >
+          + 创建图片
         </a-button>
+
+        <a-button
+          type="primary"
+          ghost
+          :icon="h(TeamOutlined)"
+          :href="`/spaceUserManage/${id}`"
+          target="_blank"
+        >
+          成员管理
+        </a-button>
+
         <a-progress
           type="circle"
           :size="42"
@@ -16,7 +34,15 @@
     <div style="margin-bottom: 16px" />
     <PictureSearchForm :on-search="onSearch" />
     <!-- 图片列表 -->
-    <PictureList :dataList="dataList" :loading="loading" :showOp="true" :onReload="fetchData" />
+    <!-- 图片列表 -->
+    <PictureList
+      :dataList="dataList"
+      :loading="loading"
+      :onReload="fetchData"
+      showOp
+      :canEdit="canEditPicture"
+      :canDelete="canDeletePicture"
+    />
     <!-- 分页 -->
     <a-pagination
       style="text-align: right"
@@ -29,12 +55,20 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { computed, h, onMounted, ref, watch } from 'vue'
 import { getSpaceVoByIdUsingGet } from '@/api/spaceController.ts'
 import { message } from 'ant-design-vue'
 import { listPictureVoByPageUsingPost } from '@/api/pictureController.ts'
 import PictureList from '@/components/PictureList.vue'
 import PictureSearchForm from '@/components/PictureSearchForm.vue'
+import { TeamOutlined } from '@ant-design/icons-vue'
+import {
+  SPACE_LEVEL_ENUM,
+  SPACE_LEVEL_MAP,
+  SPACE_LEVEL_OPTIONS, SPACE_PERMISSION_ENUM,
+  SPACE_TYPE_ENUM,
+  SPACE_TYPE_MAP
+} from '@/constants/space.ts'
 
 interface Props {
   id: string | number
@@ -96,6 +130,8 @@ const fetchData = async () => {
   loading.value = false
 }
 
+
+
 // 页面加载时获取数据，请求一次
 onMounted(() => {
   fetchData()
@@ -120,6 +156,29 @@ const onSearch = (newSearchParams: API.PictureQueryRequest) => {
   console.log('searchparams', searchParams.value)
   fetchData()
 }
+
+// 通用权限检查函数
+function createPermissionChecker(permission: string) {
+  return computed(() => {
+    return (space.value.permissionList ?? []).includes(permission)
+  })
+}
+
+// 定义权限检查
+const canManageSpaceUser = createPermissionChecker(SPACE_PERMISSION_ENUM.SPACE_USER_MANAGE)
+const canUploadPicture = createPermissionChecker(SPACE_PERMISSION_ENUM.PICTURE_UPLOAD)
+const canEditPicture = createPermissionChecker(SPACE_PERMISSION_ENUM.PICTURE_EDIT)
+const canDeletePicture = createPermissionChecker(SPACE_PERMISSION_ENUM.PICTURE_DELETE)
+
+
+watch(
+  () => props.id,
+  (newSpaceId) => {
+    fetchSpaceDetail()
+    fetchData()
+  },
+)
+
 </script>
 
 <style scoped>

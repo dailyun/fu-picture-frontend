@@ -52,7 +52,7 @@ const handleSubmit = async (values: any) => {
   if (res.data.code === 0 && res.data.data) {
     await loginUserStore.fetchLoginUser()
     message.success('登录成功')
-    router.push({
+    await router.push({
       path: '/',
       replace: true,
     })
