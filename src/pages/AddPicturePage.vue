@@ -34,8 +34,10 @@
           :imageUrl="picture?.url"
           :picture="picture"
           :spaceId="spaceId"
+          :space="space"
           :onSuccess="onSuccess"
         />
+
 
       </div>
 
@@ -76,7 +78,7 @@
 
 <script setup lang="ts">
 import PictureUpload from '@/components/PictureUpload.vue'
-import { computed, h, onMounted, reactive, ref } from 'vue'
+import { computed, h, onMounted, reactive, ref, watchEffect } from 'vue'
 import { message } from 'ant-design-vue'
 import {
   editPictureUsingPost,
@@ -90,6 +92,7 @@ import props = _default.props
 import UrlPictureUpload from '@/components/UrlPictureUpload.vue'
 import { EditOutlined } from '@ant-design/icons-vue'
 import ImageCropper from '@/components/ImageCropper.vue'
+import { getSpaceVoByIdUsingGet } from '@/api/spaceController.ts'
 
 const picture = ref<API.PictureVO>()
 const pictureForm = reactive<API.PictureEditRequest>({})
@@ -204,7 +207,25 @@ const getOldPicture = async () => {
     }
   }
 }
-// 空间 id
+const space = ref<API.SpaceVO>()
+
+// 获取空间信息
+const fetchSpace = async () => {
+  // 获取数据
+  if (spaceId.value) {
+    const res = await getSpaceVoByIdUsingGet({
+      id: spaceId.value,
+    })
+    if (res.data.code === 0 && res.data.data) {
+      space.value = res.data.data
+    }
+  }
+}
+
+watchEffect(() => {
+  fetchSpace()
+})
+
 
 
 onMounted(() => {
